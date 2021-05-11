@@ -89,6 +89,9 @@
       (mapcat #(db/select Segment :table_id (u/the-id %)) tables)))))
 
 (defn- select-collections
+  "Selects the collections for a given user-id, or all collections without a personal ID if the passed user-id is nil.
+  If `state` is passed (by default, `:active`), then that will be used to filter for collections that are archived (if
+  the value is passed as `:all`)."
   ([users]
    (select-collections users :active))
   ([users state]
@@ -130,7 +133,7 @@
          metrics     (if (contains? opts :only-db-ids)
                        (db/select Metric :table_id [:in (map :id tables)])
                        (Metric))
-         collections (Collection)] ;(select-collections users state)]
+         collections (select-collections users state)]
      (dump/dump path
                 databases
                 tables
